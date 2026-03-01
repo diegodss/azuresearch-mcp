@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  azuresearch-mcp:
+  azuresearch-mcp-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,4 +9,23 @@ services:
       - .env
     ports:
       - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./docs:/app/docs
+      - ./videos:/app/videos
     restart: unless-stopped
+
+  azuresearch-mcp-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    command: ["python", "worker.py"]
+    volumes:
+      - ./data:/app/data
+      - ./docs:/app/docs
+      - ./videos:/app/videos
+    restart: unless-stopped
+    depends_on:
+      - azuresearch-mcp-api
