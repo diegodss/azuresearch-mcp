@@ -150,6 +150,7 @@ JOB_DB_PATH=data/jobs.db
 ```
 
 Jobs and queue metadata are stored in sqlite.
+No extra infrastructure is required beyond the container volume that persists `data/jobs.db`.
 
 ### Azure Service Bus (production)
 
@@ -161,6 +162,63 @@ JOB_DB_PATH=data/jobs.db
 ```
 
 Service Bus handles delivery; sqlite still stores job lifecycle/status.
+
+## Infrastructure requirements (what you actually need)
+
+### Do I need an extra database?
+
+- Current implementation: no separate DB server is required.
+- Job status and metadata are stored in sqlite (`JOB_DB_PATH`, default `data/jobs.db`).
+- Important for production: sqlite is best for single-node deployments. If you plan to run multiple API/worker replicas, use a shared SQL backend (for example Postgres/Azure SQL) by replacing `core/job_store.py`.
+
+### Do I need to create queue subscriptions?
+
+- With the current implementation, no manual subscription is needed for queue processing.
+- `QUEUE_BACKEND=local`: worker polls the local sqlite queue table.
+- `QUEUE_BACKEND=servicebus`: worker directly receives messages from a Service Bus **queue** using connection string + queue name.
+- Service Bus **topics/subscriptions** are not used in this code path.
+
+### How workers consume jobs
+
+1. API receives `POST /ingestion/jobs`.
+2. API creates a `queued` job row in `ingestion_jobs`.
+3. API enqueues `{\"job_id\": \"...\"}`.
+4. `worker.py` continuously reserves one message, marks job `running`, executes ingestion, then marks `succeeded` or `failed`.
+5. You track status via `GET /ingestion/jobs/{job_id}`.
+
+### Service Bus setup example (queue mode)
+
+```bash
+# create namespace
+az servicebus namespace create \
+  --resource-group <rg> \
+  --name <sb-namespace> \
+  --location <region> \
+  --sku Standard
+
+# create queue
+az servicebus queue create \
+  --resource-group <rg> \
+  --namespace-name <sb-namespace> \
+  --name ingestion-jobs
+
+# get connection string
+az servicebus namespace authorization-rule keys list \
+  --resource-group <rg> \
+  --namespace-name <sb-namespace> \
+  --name RootManageSharedAccessKey \
+  --query primaryConnectionString \
+  -o tsv
+```
+
+Set in `.env`:
+
+```bash
+QUEUE_BACKEND=servicebus
+AZURE_SERVICEBUS_CONNECTION_STRING=<value-from-cli>
+AZURE_SERVICEBUS_QUEUE_NAME=ingestion-jobs
+JOB_DB_PATH=data/jobs.db
+```
 
 ## Ingestion pipelines
 
