@@ -326,6 +326,7 @@ To add a new provider (OpenSearch, Pinecone, etc.), implement `core/search_provi
 ## CI/CD to Azure App Service
 
 Workflow: [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)
+CI workflow for merge validation: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)
 
 Trigger: push to `main`
 
@@ -340,6 +341,15 @@ Required GitHub secrets:
 - `ACR_USERNAME`
 - `ACR_PASSWORD`
 - `WEBAPP_NAME`
+
+### Merge gate for `main`
+
+`ci.yml` runs on every pull request to `main` and executes `pytest -q`, including a mock-provider MCP integration test that calls `search_kb_technologyone`.
+
+To enforce this before merge:
+1. In GitHub repo settings, open Branch protection rules for `main`.
+2. Enable required status checks.
+3. Require `CI - Mock Provider Validation / validate`.
 
 ## `.env` reference
 
