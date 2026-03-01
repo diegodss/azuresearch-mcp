@@ -1,0 +1,15 @@
+apps:
+  - id: technologyone
+    name: TechnologyOne
+    description: ERP system knowledge base
+    index: kb-technologyone
+
+  - id: blackboard
+    name: Blackboard
+    description: LMS platform knowledge base
+    index: kb-blackboard
+
+  - id: dynamics365
+    name: Microsoft Dynamics 365
+    description: CRM and ERP knowledge base
+    index: kb-dynamics365
