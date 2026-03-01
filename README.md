@@ -80,6 +80,47 @@ docker compose up --build
 curl http://localhost:8000/healthz
 ```
 
+## Test without Azure credentials (recommended first run)
+
+Use the built-in mock provider so `search_kb_technologyone` returns deterministic data locally.
+
+1. In `.env` set:
+
+```bash
+SEARCH_PROVIDER=mock
+MOCK_SEARCH_DATA_PATH=config/mock_search_data.json
+AUTH_MODE=token
+MCP_API_KEY=dev-token
+QUEUE_BACKEND=local
+JOB_DB_PATH=data/jobs.db
+```
+
+2. Start services:
+
+```bash
+docker compose up --build
+```
+
+3. List tools:
+
+```bash
+curl -s http://localhost:8000/mcp \
+  -H "Authorization: Bearer dev-token" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+4. Call `search_kb_technologyone`:
+
+```bash
+curl -s http://localhost:8000/mcp \
+  -H "Authorization: Bearer dev-token" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"search_kb_technologyone","arguments":{"query":"reset password","top":3}}}'
+```
+
+Expected: response includes text similar to `Reset your TechnologyOne password`.
+
 ## App registry (no code change)
 
 Edit [`config/apps.yaml`](./config/apps.yaml) and restart.

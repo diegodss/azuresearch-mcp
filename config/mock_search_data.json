@@ -1,0 +1,38 @@
+{
+  "indexes": {
+    "kb-technologyone": [
+      {
+        "title": "Reset your TechnologyOne password",
+        "content": "Use the self-service portal and choose Forgot Password. MFA is required.",
+        "metadata": {
+          "source": "kb/technologyone/auth.md"
+        }
+      },
+      {
+        "title": "TechnologyOne invoice approval",
+        "content": "Approvers can review pending invoices under Finance > Approvals.",
+        "metadata": {
+          "source": "kb/technologyone/finance.md"
+        }
+      }
+    ],
+    "kb-blackboard": [
+      {
+        "title": "Blackboard course copy",
+        "content": "Instructors can copy content from existing courses using Course Tools.",
+        "metadata": {
+          "source": "kb/blackboard/courses.md"
+        }
+      }
+    ],
+    "kb-dynamics365": [
+      {
+        "title": "Dynamics 365 lead qualification",
+        "content": "Use the Qualify action to convert leads into opportunities.",
+        "metadata": {
+          "source": "kb/dynamics365/sales.md"
+        }
+      }
+    ]
+  }
+}
